@@ -1,13 +1,13 @@
 const Model = require('./base')
 
-class Tasks extends Model {
+class Users extends Model {
     static get tableName() {
-        return "tasks"
+        return "users"
     }
 
 
     static get encodedIdAttributes() {
-        return ["id", 'userId', 'batchId']
+        return ["id", ]
     }
 
     static get jsonAttributes() {
@@ -28,4 +28,4 @@ class Tasks extends Model {
 }
 
 
-module.exports = Tasks;
+module.exports = Users;
