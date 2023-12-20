@@ -103,7 +103,14 @@ class UsersController {
 
         } else {
             if (status === FRIEND_STATUS.ACCEPTED) {
-                data = await Friends.query().withGraphFetched('sender').modifyGraph('sender', builder => builder.select(['id', 'username'])).where({status: FRIEND_STATUS.ACCEPTED}).andWhere(builder => builder.where({recipientId: userId}).orWhere({requestedBy: userId}))
+                data = await Friends.query()
+                    .withGraphFetched('[sender, recipient]')
+                    .modifyGraph('sender',
+                            builder => builder.select(['id', 'username']))
+                    .modifyGraph('recipient',
+                        builder => builder.select(['id', 'username']))
+                    .where({status: FRIEND_STATUS.ACCEPTED})
+                    .andWhere(builder => builder.where({recipientId: userId}).orWhere({requestedBy: userId}))
 
             } else if (status === FRIEND_STATUS.PENDING) {
                 data = await Friends.query().withGraphFetched('sender').modifyGraph('sender', builder => builder.select(['id', 'username'])).where({recipientId: userId, status})
@@ -153,6 +160,17 @@ class UsersController {
         if (friend === -1) {
             throw `Not valid friend ID`
         }
+        const existing = await Friends.query().where({requestedBy: userId, recipientId: friend}).orWhere({recipientId: userId, requestedBy:friend}).first();
+
+        if (existing) {
+            if (existing.status === FRIEND_STATUS.ACCEPTED) {
+                throw `Already friends`
+            } else if (existing.status === FRIEND_STATUS.PENDING) {
+                throw `Friend request exists already`
+            } else if (existing.status === FRIEND_STATUS.DECLINED) {
+                throw `User has previously declined the friend request`
+            }
+        }
 
        await Friends.query().insert({
             requestedBy: userId,
@@ -175,6 +193,7 @@ class UsersController {
         if (!friendId) {
             throw `Missing friend ID`
         }
+        console.log(req.user.id, 22, decodeId(req.user.id), friendId, decodeId(friendId))
 
         // let data;
         const userId = decodeId(req.user.id)
@@ -183,13 +202,15 @@ class UsersController {
         if (friend === -1) {
             throw `Not valid friend ID`
         }
+
+        console.log(userId, friend)
         const existing = await Friends.query().where({requestedBy: friend, recipientId: userId}).first();
 
         if (!existing) {
             throw `Could not find friend request`
         }
 
-        if (existing?.status === FRIEND_STATUS.ACCEPTED || !!existing?.acceptedDate ) {
+        if (existing?.status === FRIEND_STATUS.ACCEPTED ) {
             throw `Friend request has already been accepted`
         }
         await existing.$query().patch({

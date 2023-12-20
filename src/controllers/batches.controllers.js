@@ -63,14 +63,39 @@ class BatchesController {
             data = await query;
         }
 
-        // if (decodeId(req.user.id) !== parseInt(data.userId)) {
-        //     throw `Unauthorized - Not the created user`
-        // }
-
 
         return response(res, {
             code: 200,
             data
+        })
+    }
+
+    @catchWrapper
+    static async updateBatchById(req,res) {
+        const {batchId} = req.params;
+
+
+        const batch =  await Batches.query().findById(decodeId(batchId))
+
+        if (!batch) {
+            throw `Batch not found`
+        }
+
+        const batchFormProps = ['name']
+
+        let resultingEntry = _.pick(req.body, batchFormProps)
+
+        await batch.$query().patch({
+            ...resultingEntry
+        })
+
+
+
+
+
+        return response(res, {
+            code: 200,
+            message: 'Success'
         })
     }
 
