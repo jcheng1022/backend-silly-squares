@@ -2,11 +2,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import response from "./utils/response";
-import Tasks from './models/Tasks.model'
-import userRouter from "./routes/users.routes";
-import taskRouter from "./routes/tasks.routes";
-import batchesRouter from "./routes/batches.router";
 
 dotenv.config();
 
@@ -40,27 +35,11 @@ app.use(bodyParser.json());
 app.use(cors())
 
 
-app.use('/tasks', taskRouter);
-app.use('/user', userRouter);
-app.use('/batches', batchesRouter);
-
-
-
 
 
 
 app.get('/', async (req, res) => {
     res.send('Hi!')
-});
-app.get('/test', async (req, res) => {
-    const data = await Tasks.query()
-
-    return response(
-        res, {
-            code: 400,
-            data
-        }
-    )
 });
 
 
