@@ -1,47 +1,54 @@
 import response from '../utils/response.js'
-import {supabase} from '../services/supabase.js';
 import Users from '../models/Users.model.js';
-import {encodeId} from "../utils/hashId";
-
+import AuthService from "../services/auth.service";
+import admin from 'firebase-admin'
+import UsersService from "../services/user.services";
 
 export default async (req, res, next) => {
 
     if (req.headers?.authorization ){
         try {
+            const { isAdmin = false } = req.query
             const token = req.headers?.authorization.replace('Bearer ', '')
-            const {data: {user}} = await supabase.auth.getUser(token)
+            const { uid, email } = await AuthService.verifyIdToken(token,isAdmin)
 
-            if (!user) {
+            if (!uid) {
+                console.log(`Error: could not verify token`)
                 return response(res, {
                     code: 401,
-                    message: 'Unauthorized No user',
+                    message: 'Unauthorized',
                 });
             }
-            const dbUser = await Users.query().where({supabaseUuid: user.id}).first()
-            if (dbUser) {
-                req.user = {
-                    ...dbUser,
-                    id: encodeId(dbUser.id),
-                    lastSignedIn: user.last_sign_in_at,
-                    role: user.role,
-                }
+
+            const user = await Users.query().where({firebaseUuid: uid}).first();
+
+            if (!user) {
+                console.log(`Creating new user from firebase`)
+                // user does not exist yet; create one
+                const firebaseUser = await admin.auth().getUser(uid)
+
+                const newUser = await UsersService.createNewUserFromFirebase(firebaseUser)
+
+                req.user = newUser
             } else {
-                await Users.query().insert({
-                    supabaseUuid: user.id,
-                    email: user.email
-                })
+
+                // check if they have a knock account registered ( for notifications )
+
+
+                req.user = user
             }
 
         } catch (error) {
-            console.log(error)
+            console.log(`Error verifying token: ${error.message}`)
             return response(res, {
                 code: 401,
-                message: 'Unauthorized',
+                message: 'Unauthorized Token',
             });
         }
 
 
     } else {
+        console.log(`No authorization header`)
         return response(res, {
             code: 401,
             message: 'Unauthorized',
@@ -49,7 +56,7 @@ export default async (req, res, next) => {
     }
 
 
-
+    req.accessToken = req.headers?.authorization.replace('Bearer ', '')
     return next();
 };
 

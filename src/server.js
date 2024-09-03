@@ -2,12 +2,24 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
+import userRouter from "./routes/users.routes";
+import {initializeApp} from "firebase-admin/app";
 
+import admin from 'firebase-admin'
 dotenv.config();
 
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+
+export let firebaseApp;
+if (process.env.FIREBASE_ADMIN) {
+    firebaseApp = initializeApp({
+        credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN)),
+        // storageBucket: process.env.STORAGE_BUCKET
+    })
+}
 
 const knexStringcase = require('knex-stringcase');
 const knex = require('knex')
@@ -33,6 +45,8 @@ Model.knex(knexInstance)
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 app.use(cors())
+
+app.use('/user', userRouter)
 
 
 

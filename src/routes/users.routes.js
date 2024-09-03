@@ -4,7 +4,7 @@ import authGate from '../middleware/authGate';
 
 const userRouter = express.Router();
 
-// userRouter.get('/me', authGate, UserController.getCurrentUser)
+userRouter.get('/me', authGate, UserController.getCurrentUser)
 
 
 
