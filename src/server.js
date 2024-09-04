@@ -8,8 +8,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 import admin from 'firebase-admin'
 import taskRouter from "./routes/task.routes";
-import response from "./utils/response";
-import ClaudeService from "./services/claude.service";
+
 dotenv.config();
 
 

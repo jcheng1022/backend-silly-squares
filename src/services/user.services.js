@@ -1,5 +1,6 @@
 import Users from '../models/Users.model'
 import {decodeId} from "../utils/hashId";
+
 class UserServices {
 
     static async isValidUser(userId) {
