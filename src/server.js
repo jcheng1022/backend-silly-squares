@@ -4,8 +4,12 @@ import dotenv from 'dotenv';
 import express from 'express';
 import userRouter from "./routes/users.routes";
 import {initializeApp} from "firebase-admin/app";
+import Anthropic from '@anthropic-ai/sdk';
 
 import admin from 'firebase-admin'
+import taskRouter from "./routes/task.routes";
+import response from "./utils/response";
+import ClaudeService from "./services/claude.service";
 dotenv.config();
 
 
@@ -20,6 +24,11 @@ if (process.env.FIREBASE_ADMIN) {
         // storageBucket: process.env.STORAGE_BUCKET
     })
 }
+
+export const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY, // defaults to process.env["ANTHROPIC_API_KEY"]
+});
+
 
 const knexStringcase = require('knex-stringcase');
 const knex = require('knex')
@@ -48,6 +57,8 @@ app.use(cors())
 
 app.use('/user', userRouter)
 
+app.use('/task', taskRouter)
+
 
 
 
@@ -55,7 +66,6 @@ app.use('/user', userRouter)
 app.get('/', async (req, res) => {
     res.send('Hi!')
 });
-
 
 
 
