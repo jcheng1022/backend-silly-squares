@@ -11,7 +11,6 @@ class TaskControllers {
         const data = await ClaudeService.askClaude(req.body.data)
 
 
-        console.log(currentUsage, 'currentUsage')
 
         if (!!req.usage) {
             const  currentUsage = {

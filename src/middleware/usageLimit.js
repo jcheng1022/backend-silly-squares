@@ -20,8 +20,8 @@ export default async (req, res, next) => {
 
         req.usage = await Usage.query().insert({
             userId: decodeId(req.user.id),
-            dailyUsage: 1,
-            weeklyUsage: 1
+            dailyUsage: 2,
+            weeklyUsage: 2
         })
 
 
