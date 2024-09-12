@@ -6,8 +6,6 @@ const userRouter = express.Router();
 
 userRouter.get('/me', authGate, UserController.getCurrentUser)
 
-userRouter.get('/credits', authGate, UserController.getUserCredits)
-
 
 
 export default userRouter;

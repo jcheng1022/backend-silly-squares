@@ -4,16 +4,26 @@ import dotenv from 'dotenv';
 import express from 'express';
 import userRouter from "./routes/users.routes";
 import {initializeApp} from "firebase-admin/app";
-import Anthropic from '@anthropic-ai/sdk';
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
+
 
 import admin from 'firebase-admin'
-import taskRouter from "./routes/task.routes";
 
 dotenv.config();
 
 
 const app = express();
+
 const PORT = process.env.PORT || 8080;
+
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000", // your frontend URL
+        methods: ["GET", "POST"]
+    }
+});
 
 
 export let firebaseApp;
@@ -23,10 +33,6 @@ if (process.env.FIREBASE_ADMIN) {
         // storageBucket: process.env.STORAGE_BUCKET
     })
 }
-
-export const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY, // defaults to process.env["ANTHROPIC_API_KEY"]
-});
 
 
 const knexStringcase = require('knex-stringcase');
@@ -56,7 +62,6 @@ app.use(cors())
 
 app.use('/user', userRouter)
 
-app.use('/task', taskRouter)
 
 
 
@@ -67,7 +72,20 @@ app.get('/', async (req, res) => {
 });
 
 
+io.on('connection', (socket) => {
+    console.log('A user connected', socket.id);
 
-app.listen(PORT, () => {
+    // Example action handler
+    socket.on('userAction', (data) => {
+        console.log('User action received:', data);
+        // Process the action here
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,6 +1,5 @@
 import Users from '../models/Users.model'
 import {decodeId} from "../utils/hashId";
-import Usage from "../models/Usage.model";
 
 class UserServices {
 
@@ -27,12 +26,6 @@ class UserServices {
             name: user?.displayName,
             // username: generateUsername(user?.displayName)
 
-        })
-
-        await Usage.query().insert({
-            userId: newUser.id,
-            dailyUsage: 2,
-            weeklyUsage: 2
         })
 
 
