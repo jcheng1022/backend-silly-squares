@@ -71,7 +71,7 @@ class GamesControllers {
                 playerOne: game?.playerOne,
                 playerTwo: game?.playerTwo
             },
-            message: "Successfully created game"
+
         })
     }
 
