@@ -6,6 +6,7 @@ import GamesControllers from "../controllers/games.controllers.js";
 const gamesRouter = express.Router();
 
 gamesRouter.get('/lobbies', authGate, GamesControllers.getAllActiveGames)
+gamesRouter.post('/', authGate, GamesControllers.createGame)
 
 
 

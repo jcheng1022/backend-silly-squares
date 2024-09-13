@@ -33,7 +33,12 @@ class Games extends Model {
     }
 
     $formatJson(json) {
-        return super.$formatJson(json)
+        const data = super.$formatJson(json)
+        data.hasPassword = !!json.password
+
+        delete data.password
+
+        return data;
     }
 }
 
