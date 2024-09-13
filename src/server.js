@@ -4,8 +4,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import userRouter from "./routes/users.routes";
 import {initializeApp} from "firebase-admin/app";
-import { Server } from 'socket.io';
-import { createServer } from 'node:http';
+import {Server} from 'socket.io';
+import {createServer} from 'node:http';
 
 
 import admin from 'firebase-admin'
