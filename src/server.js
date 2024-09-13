@@ -9,6 +9,7 @@ import { createServer } from 'node:http';
 
 
 import admin from 'firebase-admin'
+import gamesRouter from "./routes/games.routes.js";
 
 dotenv.config();
 
@@ -61,7 +62,7 @@ app.use(bodyParser.json());
 app.use(cors())
 
 app.use('/user', userRouter)
-
+app.use('/games', gamesRouter)
 
 
 
