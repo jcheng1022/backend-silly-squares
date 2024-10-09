@@ -14,7 +14,7 @@ class GamesControllers {
                 builder.select(['id', 'name'])
             })
             .where({
-            status: "OPEN"
+            status: GAME_STATE.WAITING_JOIN
         })
 
         return response(res, {
@@ -199,6 +199,7 @@ class GamesControllers {
 
     @catchWrapper
     static async updateGameStatus(req, res) {
+
         const {gameId, type} = req.params
 
         if (!type) throw `Missing status update type`
@@ -207,10 +208,13 @@ class GamesControllers {
 
         if (!gameId) throw `Missing Game ID`
 
+
         const game = await Games.query()
             .findById(decodeId(gameId))
 
         if (!game)  throw `Game not found`
+
+
 
         const currentStatus = game?.status
 
